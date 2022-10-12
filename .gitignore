@@ -1,0 +1,9 @@
+main.py
+test.py
+.idea
+venv
+build
+dist
+*.egg-info
+*.pyc
+example.pdf
