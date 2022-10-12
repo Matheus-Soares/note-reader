@@ -1,4 +1,4 @@
-from reader.ticker_map import ticker_dict
+from reader.ticker_dict import ticker_dict
 
 class BuilderReaderBase:
     def __init__(self, raw_text):
