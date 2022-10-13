@@ -5,7 +5,7 @@ from reader.builder.builder_reader_base import BuilderReaderBase
 
 
 class ClearReaderBuilder(BuilderReaderBase):
-    NEGOCIACOES_PATTERN = '(1-BOVESPA\n)([CV]\s)(VISTA\s|FRACIONARIO\s)([A-Z0-9. ]+)(\n\#\n|\n)([0-9]+\n)([0-9.]+,[0-9]{2}\n)([0-9.]+,[0-9]{2}\n)([CD]\n)'
+    NEGOCIACOES_PATTERN = '(1-BOVESPA\n)([CV]\s)(VISTA\s|FRACIONARIO\s)([A-Z0-9.\- ]+)(\n\#\n|\n)([0-9]+\n)([0-9.]+,[0-9]{2}\n)([0-9.]+,[0-9]{2}\n)([CD]\n)'
 
     def build_negociacoes(self):
         self.parsed_data['negocios'] = []
