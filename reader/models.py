@@ -11,7 +11,10 @@ class Negocio(BaseModel):
     preco: float
 
     def __str__(self):
-        return "" + self.titulo + "," + self.ticker + "," + str(self.qtd) + "," + str(self.preco)
+        if (self.titulo is None):
+            return "" + self.titulo + "," + self.ticker + "," + str(self.qtd) + "," + str(self.preco)
+        else:
+            return "" + self.ticker + "," + str(self.qtd) + "," + str(self.preco)
 
 class NotaDeCorretagem(BaseModel):
     negocios: List[Negocio]
