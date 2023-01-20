@@ -9,12 +9,13 @@ if __name__ == '__main__':
         raise Exception("Você deve informar o arquivo a ser lido.")
     filepath = sys.argv[1]
     
-    if (len(sys.argv) == 1):
+    if (len(sys.argv) == 3):
         builder = sys.argv[2]
     else:
         builder = 'nuinvest'
     
-    if (builder == 'clear'):    
+    if (builder == 'clear'):
+        print("clear")
         result = NotaDeCorretagemReader(filepath).read(parser=ClearReaderBuilder)
     else:
         result = NotaDeCorretagemReader(filepath).read(parser=NuinvestReaderBuilder)
