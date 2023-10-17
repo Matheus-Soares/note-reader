@@ -74,8 +74,8 @@ def print_values(result):
     print("\n\nTaxa de liquidação = R$ " + str(result['liquidacao']))
     print("Emolumentos = R$ " + str(result['emolumentos']))
     print("IRRF = R$ " + str(result['irrf']))
-    print("\n\nTotal vendas = R$ " + str(result['vendas']))
-    print("Total compras = R$ " + str(result['compras']))
+    print("\n\nTotal compras = R$ " + str(result['compras']))
+    print("Total vendas = R$ " + str(result['vendas']))
 
     print("\nTotal operações lidas = R$ " + str(result['total']))
     print("Total operações nota = R$ " + str(result['total_operacoes']))
