@@ -2,14 +2,16 @@ import csv
 import re
 
 
-class ClearReader:
+class ItauReader:
     _TICKERS_FILE = 'tickers.csv'
-    _NEGOCIACOES_PATTERN = '(1-BOVESPA)\n([CV])\s(VISTA|FRACIONARIO)\n(.*)\n(?:.*?\n?)([0-9.]+)\n([0-9.]+,[0-9]{2})\n([0-9.]+,[0-9]{2})\n([CD])\n'
+    _NEGOCIACOES_PATTERN = '(BOVESPA)\n([CV])\n(VISTA|FRACIONARIO)\n(.*)\n(?:.*?\n?)([0-9.]+)\n([0-9.]+,[0-9]{2})\n([0-9.]+,[0-9]{2})\n([CD])\n'
     _TICKER_PATTERN = '([A-Z][A-Z][A-Z][A-Z][0-9]+)'
-    _TAXA_LIQUIDACAO_PATTERN = '([0-9.]+,[0-9]{2})\nTaxa de liquidação'
-    _EMOLUMENTOS_PATTERN = '([0-9.]+,[0-9]{2})\nEmolumentos'
-    _IRRF_PATTERN = '([0-9.]+,[0-9]{2})\nI.R.R.F. s/ operações'
-    _TOTAL_OPERACOES_PATTERN = '([0-9.]+,[0-9]{2})\nResumo dos Negócios'
+    _TAXA_LIQUIDACAO_PATTERN = '(Taxa de liquidação)\n-?([0-9.]+,[0-9]{2})'
+    _EMOLUMENTOS_PATTERN = '(Emolumentos)\n-?([0-9.]+,[0-9]{2})'
+    _IRRF_PATTERN = '(I.R.R.F s/operações. Base).*\n([0-9.]+,[0-9]{2})'
+    _VENDAS_PATTERN = '(Vendas à Vista)\n([0-9.]+,[0-9]{2})'
+    _COMPRAS_PATTERN = '(Compras à Vista)\n([0-9.]+,[0-9]{2})'
+    _TOTAL_OPERACOES_PATTERN = '(Valor das operações)\n([0-9.]+,[0-9]{2})'
 
     def __init__(self, raw_text):
         self._raw_text = raw_text
@@ -64,37 +66,39 @@ class ClearReader:
                 return value
         return None
 
-
     def parse_ticker(self, value: str) -> str:
         matches = re.findall(self._TICKER_PATTERN, value)
         if len(matches) != 0:
             return matches[0]
 
+        clean_value = value.replace(" EJ", "").replace(" EDJ", "")
         ticker_dict = self.get_ticker_dict()
-        ticker = self.get_ticker_by_first_word(ticker_dict, value)
+        ticker = self.get_ticker_by_first_word(ticker_dict, clean_value)
         if ticker is not None:
             return ticker
         else:
-            return self.ask_user_for_ticker(value)
+            return self.ask_user_for_ticker(clean_value)
 
     @staticmethod
     def clean_string(value: str) -> str:
         return value.strip().replace('\n', '')
 
     def parse(self):
-        self._result = {
+        self.result = {
             'negocios': [],
-            'liquidacao': re.findall(self._TAXA_LIQUIDACAO_PATTERN, self._raw_text)[0],
-            'emolumentos': re.findall(self._EMOLUMENTOS_PATTERN, self._raw_text)[0],
-            'irrf': re.findall(self._IRRF_PATTERN, self._raw_text)[0],
-            'total_operacoes': self.parse_price(re.findall(self._TOTAL_OPERACOES_PATTERN, self._raw_text)[0])
+            'liquidacao': re.findall(self._TAXA_LIQUIDACAO_PATTERN, self._raw_text)[0][1],
+            'emolumentos': re.findall(self._EMOLUMENTOS_PATTERN, self._raw_text)[0][1],
+            'irrf': re.findall(self._IRRF_PATTERN, self._raw_text)[0][1],
+            'vendas': self.parse_price(re.findall(self._VENDAS_PATTERN, self._raw_text)[0][1]),
+            'compras': self.parse_price(re.findall(self._COMPRAS_PATTERN, self._raw_text)[0][1]),
+            'total_operacoes': self.parse_price(re.findall(self._TOTAL_OPERACOES_PATTERN, self._raw_text)[0][1])
         }
         total = 0.0
 
         for neg in re.findall(self._NEGOCIACOES_PATTERN, self._raw_text):
             quantity = self.parse_quantity(neg[4], cv=neg[1])
             price = self.parse_price(neg[5])
-            self._result['negocios'].append(
+            self.result['negocios'].append(
                 {
                     'ticker': self.parse_ticker(neg[3]),
                     'quantity': quantity,
@@ -103,26 +107,28 @@ class ClearReader:
             )
             total += round(abs(quantity) * price, 2)
 
-        self._result['total'] = round(total, 2)
-        return self._result
+        self.result['total'] = round(total, 2)
+        return self.result
 
     def print_result(self):
-        print("\n\nTicker,Qtd,Preço")
+        print("\nTicker,Qtd,Preço")
 
-        for neg in self._result['negocios']:
+        for neg in self.result['negocios']:
             print(neg['ticker'] + ";" + str(neg['quantity']) + ";" + str(neg['price']).replace('.', ","))
 
-        print("\n\nTaxa de liquidação = R$ " + str(self._result['liquidacao']))
-        print("Emolumentos = R$ " + str(self._result['emolumentos']))
-        print("IRRF = R$ " + str(self._result['irrf']))
+        print("\n\nTaxa de liquidação = R$ " + str(self.result['liquidacao']))
+        print("Emolumentos = R$ " + str(self.result['emolumentos']))
+        print("IRRF = R$ " + str(self.result['irrf']))
+        print("\n\nTotal compras = R$ " + str(self.result['compras']))
+        print("Total vendas = R$ " + str(self.result['vendas']))
 
-        print("\nTotal operações lidas = R$ " + str(self._result['total']))
-        print("Total operações nota = R$ " + str(self._result['total_operacoes']))
+        print("\nTotal operações lidas = R$ " + str(self.result['total']))
+        print("Total operações nota = R$ " + str(self.result['total_operacoes']))
 
-        if self._result['total'] != self._result['total_operacoes']:
+        if self.result['total'] != self.result['total_operacoes']:
             print("\n\n\033[1;31m--- Lista de negociações incompleta, necessário revisar itens lidos! ---\033[0m\n")
         else:
-            print("\n\n\033[1;32m--- Lista de negociações lida com sucesso! ---\033[0m")
+            print("\n\n\033[1;32m--- Lista de negociações lida com sucesso! ---\033[0m\n")
 
         if len(self._new_tickers) != 0:
             self.update_tickers_file()
