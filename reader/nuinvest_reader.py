@@ -59,7 +59,7 @@ class NuInvestReader:
         print("\nTicker,Qtd,Preço")
 
         for neg in self._result['negocios']:
-            print(neg['ticker'] + ";" + str(neg['quantity']) + ";" + str(neg['price']).replace('.', ","))
+            print(neg['ticker'] + "\t" + str(neg['quantity']) + "\t" + str(neg['price']).replace('.', ","))
 
         print("\n\nTaxa de liquidação = R$ " + str(self._result['liquidacao']))
         print("Emolumentos = R$ " + str(self._result['emolumentos']))
