@@ -2,7 +2,7 @@ import re
 
 
 class NuInvestReader:
-    _NEGOCIACOES_PATTERN = '(BOVESPA)\n([CV])\n(VISTA|FRACIONARIO)\n([A-Z][A-Z][A-Z][A-Z][0-9]+)[A-Z]*.*\n(?:#?\n?)([0-9.]+)\n([0-9.]+,[0-9]{2})\n([0-9.]+,[0-9]{2})\n([CD])\n'
+    _NEGOCIACOES_PATTERN = '(BOVESPA)\n([CV])\n(VISTA|FRACIONARIO)\n([A-Z][A-Z][A-Z][A-Z][0-9]+)[A-Z]*.*\n(?:#?D?\n?)([0-9.]+)\n([0-9.]+,[0-9]{2})\n([0-9.]+,[0-9]{2})\n([CD])\n'
     _TAXA_LIQUIDACAO_PATTERN = '(Taxa de Liquidação)\n-?([0-9.]+,[0-9]{2})'
     _EMOLUMENTOS_PATTERN = '(Emolumentos)\n-?([0-9.]+,[0-9]{2})'
     _IRRF_PATTERN = '(I.R.R.F. s/ operações. Base).*\n([0-9.]+,[0-9]{2})'
