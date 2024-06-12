@@ -2,13 +2,13 @@ import re
 
 
 class NuInvestReader:
-    _NEGOCIACOES_PATTERN = '(BOVESPA)\n([CV])\n(VISTA|FRACIONARIO)\n([A-Z][A-Z][A-Z][A-Z][0-9]+)[A-Z]*.*\n(?:#?D?\n?)([0-9.]+)\n([0-9.]+,[0-9]{2})\n([0-9.]+,[0-9]{2})\n([CD])\n'
-    _TAXA_LIQUIDACAO_PATTERN = '(Taxa de Liquidação)\n-?([0-9.]+,[0-9]{2})'
-    _EMOLUMENTOS_PATTERN = '(Emolumentos)\n-?([0-9.]+,[0-9]{2})'
-    _IRRF_PATTERN = '(I.R.R.F. s/ operações. Base).*\n([0-9.]+,[0-9]{2})'
-    _VENDAS_PATTERN = '(Vendas à vista)\n([0-9.]+,[0-9]{2})'
-    _COMPRAS_PATTERN = '(Compras à vista)\n([0-9.]+,[0-9]{2})'
-    _TOTAL_OPERACOES_PATTERN = '(Valor das Operações)\n([0-9.]+,[0-9]{2})'
+    _NEGOCIACOES_PATTERN = r'(BOVESPA)\n([CV])\n(VISTA|FRACIONARIO)\n([A-Z][A-Z][A-Z][A-Z][0-9]+)[A-Z]*.*\n(?:#?D?\n?)([0-9.]+)\n([0-9.]+,[0-9]{2})\n([0-9.]+,[0-9]{2})\n([CD])\n'
+    _TAXA_LIQUIDACAO_PATTERN = r'(Taxa de Liquidação)\n-?([0-9.]+,[0-9]{2})'
+    _EMOLUMENTOS_PATTERN = r'(Emolumentos)\n-?([0-9.]+,[0-9]{2})'
+    _IRRF_PATTERN = r'(I.R.R.F. s/ operações. Base).*\n([0-9.]+,[0-9]{2})'
+    _VENDAS_PATTERN = r'(Vendas à vista)\n([0-9.]+,[0-9]{2})'
+    _COMPRAS_PATTERN = r'(Compras à vista)\n([0-9.]+,[0-9]{2})'
+    _TOTAL_OPERACOES_PATTERN = r'(Valor das Operações)\n([0-9.]+,[0-9]{2})'
 
     def __init__(self, raw_text):
         self._raw_text = raw_text
@@ -56,7 +56,7 @@ class NuInvestReader:
         return self._result
 
     def print_result(self):
-        print("\nTicker,Qtd,Preço")
+        print("\nTicker\tQtd\tPreço")
 
         for neg in self._result['negocios']:
             print(neg['ticker'] + "\t" + str(neg['quantity']) + "\t" + str(neg['price']).replace('.', ","))

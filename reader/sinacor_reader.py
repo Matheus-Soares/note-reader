@@ -2,14 +2,15 @@ import csv
 import re
 
 
-class ClearReader:
+class SinacorReader:
     _TICKERS_FILE = 'tickers.csv'
-    _NEGOCIACOES_PATTERN = '(1-BOVESPA)\n([CV])\s(VISTA|FRACIONARIO)\n(.*)\n(?:.*?\n?)([0-9.]+)\n([0-9.]+,[0-9]{2})\n([0-9.]+,[0-9]{2})\n([CD])\n'
-    _TICKER_PATTERN = '([A-Z][A-Z][A-Z][A-Z][0-9]+)'
-    _TAXA_LIQUIDACAO_PATTERN = '([0-9.]+,[0-9]{2})\nTaxa de liquidação'
-    _EMOLUMENTOS_PATTERN = '([0-9.]+,[0-9]{2})\nEmolumentos'
-    _IRRF_PATTERN = '([0-9.]+,[0-9]{2})\nI.R.R.F. s/ operações'
-    _TOTAL_OPERACOES_PATTERN = '([0-9.]+,[0-9]{2})\nResumo dos Negócios'
+    _NEGOCIACOES_PATTERN = r'(1-BOVESPA)\n([CV])\s(VISTA|FRACIONARIO)\n(.*)\n(?:.*?\n?)([0-9.]+)\n([0-9.]+,[0-9]{2})\n([0-9.]+,[0-9]{2})\n([CD])\n'
+    _TICKER_PATTERN = r'([A-Z][A-Z][A-Z][A-Z][0-9]+)'
+    _TAXA_LIQUIDACAO_PATTERN = r'([0-9.]+,[0-9]{2})\nTaxa de liquidação'
+    _EMOLUMENTOS_PATTERN = r'([0-9.]+,[0-9]{2})\nEmolumentos'
+    _IRRF_PATTERN = r'([0-9.]+,[0-9]{2})\nI.R.R.F. s/ operações'
+    _OUTROS_PATTERN = r'([0-9.]+,[0-9]{2})\nOutros'
+    _TOTAL_OPERACOES_PATTERN = r'([0-9.]+,[0-9]{2})\nResumo dos Negócios'
 
     def __init__(self, raw_text):
         self._raw_text = raw_text
@@ -64,7 +65,6 @@ class ClearReader:
                 return value
         return None
 
-
     def parse_ticker(self, value: str) -> str:
         matches = re.findall(self._TICKER_PATTERN, value)
         if len(matches) != 0:
@@ -87,6 +87,7 @@ class ClearReader:
             'liquidacao': re.findall(self._TAXA_LIQUIDACAO_PATTERN, self._raw_text)[0],
             'emolumentos': re.findall(self._EMOLUMENTOS_PATTERN, self._raw_text)[0],
             'irrf': re.findall(self._IRRF_PATTERN, self._raw_text)[0],
+            'outros': re.findall(self._OUTROS_PATTERN, self._raw_text)[0],
             'total_operacoes': self.parse_price(re.findall(self._TOTAL_OPERACOES_PATTERN, self._raw_text)[0])
         }
         total = 0.0
@@ -107,13 +108,14 @@ class ClearReader:
         return self._result
 
     def print_result(self):
-        print("\n\nTicker,Qtd,Preço")
+        print("\n\nTicker\tQtd\tPreço")
 
         for neg in self._result['negocios']:
             print(neg['ticker'] + "\t" + str(neg['quantity']) + "\t" + str(neg['price']).replace('.', ","))
 
         print("\n\nTaxa de liquidação = R$ " + str(self._result['liquidacao']))
         print("Emolumentos = R$ " + str(self._result['emolumentos']))
+        print("Outros = R$ " + str(self._result['outros']))
         print("IRRF = R$ " + str(self._result['irrf']))
 
         print("\nTotal operações lidas = R$ " + str(self._result['total']))
