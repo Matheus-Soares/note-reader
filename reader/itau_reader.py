@@ -4,7 +4,7 @@ import re
 
 class ItauReader:
     _TICKERS_FILE = 'tickers.csv'
-    _NEGOCIACOES_PATTERN = r'(BOVESPA)\n([CV])\n(VISTA|FRACIONARIO)\n(.*)\n(?:.*?\n?)([0-9.]+)\n([0-9.]+,[0-9]{2})\n([0-9.]+,[0-9]{2})\n([CD])\n'
+    _NEGOCIACOES_PATTERN = r'(BOVESPA|B3 RV LISTADO)\n([CV])\n(VISTA|FRACIONARIO)\n(.*)\n(?:.*?\n?)([0-9.]+)\n([0-9.]+,[0-9]{2})\n([0-9.]+,[0-9]{2})\n([CD])\n'
     _TICKER_PATTERN = r'([A-Z][A-Z][A-Z][A-Z][0-9]+)'
     _TAXA_LIQUIDACAO_PATTERN = r'(Taxa de liquidação)\n-?([0-9.]+,[0-9]{2})'
     _EMOLUMENTOS_PATTERN = r'(Emolumentos)\n-?([0-9.]+,[0-9]{2})'
@@ -93,6 +93,7 @@ class ItauReader:
             'compras': self.parse_price(re.findall(self._COMPRAS_PATTERN, self._raw_text)[0][1]),
             'total_operacoes': self.parse_price(re.findall(self._TOTAL_OPERACOES_PATTERN, self._raw_text)[0][1])
         }
+        #print(self._raw_text)
         total = 0.0
 
         for neg in re.findall(self._NEGOCIACOES_PATTERN, self._raw_text):
