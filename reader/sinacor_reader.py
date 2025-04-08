@@ -1,5 +1,6 @@
 import csv
 import re
+from collections import defaultdict
 
 
 class SinacorReader:
@@ -50,20 +51,9 @@ class SinacorReader:
         return self._ticker_dict
 
     @staticmethod
-    def get_ticker_by_first_word(ticker_dict, value):
+    def get_ticker(ticker_dict, value):
         ticker = ticker_dict.get(value)
-        if ticker is not None:
-            return ticker
-
-        first_word_value = value.split()[0]
-        if first_word_value == 'FII':
-            return None
-
-        for (key, value) in ticker_dict.items():
-            first_word = key.split()[0]
-            if first_word == first_word_value:
-                return value
-        return None
+        return ticker
 
     def parse_ticker(self, value: str) -> str:
         matches = re.findall(self._TICKER_PATTERN, value)
@@ -71,7 +61,7 @@ class SinacorReader:
             return matches[0]
 
         ticker_dict = self.get_ticker_dict()
-        ticker = self.get_ticker_by_first_word(ticker_dict, value)
+        ticker = self.get_ticker(ticker_dict, value)
         if ticker is not None:
             return ticker
         else:
@@ -83,7 +73,7 @@ class SinacorReader:
 
     def parse(self):
         self._result = {
-            'negocios': [],
+            'negocios': defaultdict(int),
             'liquidacao': re.findall(self._TAXA_LIQUIDACAO_PATTERN, self._raw_text)[0],
             'emolumentos': re.findall(self._EMOLUMENTOS_PATTERN, self._raw_text)[0],
             'irrf': re.findall(self._IRRF_PATTERN, self._raw_text)[0],
@@ -95,13 +85,9 @@ class SinacorReader:
         for neg in re.findall(self._NEGOCIACOES_PATTERN, self._raw_text):
             quantity = self.parse_quantity(neg[4], cv=neg[1])
             price = self.parse_price(neg[5])
-            self._result['negocios'].append(
-                {
-                    'ticker': self.parse_ticker(neg[3]),
-                    'quantity': quantity,
-                    'price': price,
-                }
-            )
+
+            key = (self.parse_ticker(neg[3]), price)
+            self._result['negocios'][key] += quantity
             total += round(abs(quantity) * price, 2)
 
         self._result['total'] = round(total, 2)
@@ -110,8 +96,8 @@ class SinacorReader:
     def print_result(self):
         print("\n\nTicker\tQtd\tPreço")
 
-        for neg in self._result['negocios']:
-            print(neg['ticker'] + "\t" + str(neg['quantity']) + "\t" + str(neg['price']).replace('.', ","))
+        for (ticker, price), quantity in self._result['negocios'].items():
+            print(ticker + "\t" + str(quantity) + "\t" + str(price).replace('.', ","))
 
         print("\n\nTaxa de liquidação = R$ " + str(self._result['liquidacao']))
         print("Emolumentos = R$ " + str(self._result['emolumentos']))
