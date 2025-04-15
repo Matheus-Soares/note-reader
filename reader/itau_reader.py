@@ -4,7 +4,7 @@ import re
 
 class ItauReader:
     _TICKERS_FILE = 'tickers.csv'
-    _NEGOCIACOES_PATTERN = r'(BOVESPA|B3 RV LISTADO)\n([CV])\n(VISTA|FRACIONARIO)\n(.*)\n(?:.*?\n?)([0-9.]+)\n([0-9.]+,[0-9]{2})\n([0-9.]+,[0-9]{2})\n([CD])\n'
+    _NEGOCIACOES_PATTERN = r'(BOVESPA|B3 RV LISTADV)\n(VISTA|FRACIONARIO)\n(.*)\n(?:.*?\n?)([0-9.]+)\n([0-9.]+,[0-9]{2})\n([0-9.]+,[0-9]{2})\n([CD])\n'
     _TICKER_PATTERN = r'([A-Z][A-Z][A-Z][A-Z][0-9]+)'
     _TAXA_LIQUIDACAO_PATTERN = r'(Taxa de liquidação)\n-?([0-9.]+,[0-9]{2})'
     _EMOLUMENTOS_PATTERN = r'(Emolumentos)\n-?([0-9.]+,[0-9]{2})'
@@ -97,11 +97,12 @@ class ItauReader:
         total = 0.0
 
         for neg in re.findall(self._NEGOCIACOES_PATTERN, self._raw_text):
-            quantity = self.parse_quantity(neg[4], cv=neg[1])
-            price = self.parse_price(neg[5])
+            #print(neg)
+            quantity = self.parse_quantity(neg[3], cv=neg[6])
+            price = self.parse_price(neg[4])
             self.result['negocios'].append(
                 {
-                    'ticker': self.parse_ticker(neg[3]),
+                    'ticker': self.parse_ticker(neg[2]),
                     'quantity': quantity,
                     'price': price,
                 }
