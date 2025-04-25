@@ -1,0 +1,9 @@
+[project]
+name = "note-reader"
+version = "2025.05.01"
+description = "Note Reader"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pymupdf>=1.25.5",
+]

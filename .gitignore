@@ -6,3 +6,4 @@ dist
 *.egg-info
 *.pyc
 example.pdf
+/uv.lock
