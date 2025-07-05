@@ -3,12 +3,14 @@ import sys
 
 import fitz
 
+from reader.btg_reader import BTGReader
 from reader.itau_reader import ItauReader
 from reader.nuinvest_reader import NuInvestReader
 from reader.sinacor_reader import SinacorReader
 
 NUINVEST_NAME = "NuInvest Corretora de Valores S.A"
 ITAU_NAME = "ItaúCorretora de Valores S/A"
+BTG_NAME = "BTG Pactual CTVM S.A."
 
 
 def extract_text(path):
@@ -36,6 +38,11 @@ if __name__ == '__main__':
     elif ITAU_NAME in raw_text:
         print("Lendo Nota de Corretagem Padrão Itaú")
         reader = ItauReader(raw_text)
+        reader.parse()
+        reader.print_result()
+    elif BTG_NAME in raw_text:
+        print("Lendo Nota de Corretagem Padrão BTG")
+        reader = BTGReader(raw_text)
         reader.parse()
         reader.print_result()
     else:
