@@ -4,7 +4,7 @@ import re
 
 class ItauReader:
     _TICKERS_FILE = 'tickers.csv'
-    _NEGOCIACOES_PATTERN = r'(BOVESPA|B3 RV LISTADV|B3 RV LISTADC)\n(VISTA|FRACIONARIO)\n(.*)\n(?:.*?\n?)([0-9.]+)\n([0-9.]+,[0-9]{2})\n([0-9.]+,[0-9]{2})\n([CD])\n'
+    _NEGOCIACOES_PATTERN = r'(BOVESPA|B3 RV LISTADV|B3 RV LISTADC|B3 RV LISTA C|B3 RV LISTA V)\n(VISTA|FRACIONARIO)\n(.*)\n(?:.*?\n?)([0-9.]+)\n([0-9.]+,[0-9]{2})\n([0-9.]+,[0-9]{2})\n([CD])\n'
     _TICKER_PATTERN = r'([A-Z][A-Z][A-Z][A-Z][0-9]+)'
     _TAXA_LIQUIDACAO_PATTERN = r'(Taxa de liquidação)\n-?([0-9.]+,[0-9]{2})'
     _EMOLUMENTOS_PATTERN = r'(Emolumentos)\n-?([0-9.]+,[0-9]{2})'
@@ -12,6 +12,7 @@ class ItauReader:
     _VENDAS_PATTERN = r'(Vendas à Vista)\n([0-9.]+,[0-9]{2})'
     _COMPRAS_PATTERN = r'(Compras à Vista)\n([0-9.]+,[0-9]{2})'
     _TOTAL_OPERACOES_PATTERN = r'(Valor das operações)\n([0-9.]+,[0-9]{2})'
+
 
     def __init__(self, raw_text):
         self._raw_text = raw_text
