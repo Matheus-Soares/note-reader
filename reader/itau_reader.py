@@ -23,7 +23,7 @@ class ItauReader:
     def parse_quantity(self, value: str, cv='C') -> int:
         cleaned_str = self.clean_string(value).replace('.', '')
         value = abs(int(cleaned_str))
-        return value if cv.strip() == 'C' else value * -1
+        return value if cv.strip() == 'D' else value * -1
 
     def parse_price(self, value: str) -> float:
         cleaned_str = self.clean_string(value).replace('.', '').replace(',', '.')
