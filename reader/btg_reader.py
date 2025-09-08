@@ -2,9 +2,10 @@ import re
 
 
 class BTGReader:
-    _NEGOCIACOES_PATTERN = r'1-BOVESPA\n([CV])\n(VISTA|FRACIONARIO)\n([A-Z]{4}[0-9]{1,2})F?\n(?:(?:PN|ON|UNT)\n)?([0-9.]+)\n([0-9.]+,[0-9]{2})\n([0-9.]+,[0-9]{2})\n([DC])\n'
-    _TAXA_LIQUIDACAO_PATTERN = r'([0-9.]+,[0-9]{2})\nTaxa de liquidação\n'
+    _NEGOCIACOES_PATTERN = r'1-BOVESPA\n([CV])\n(VISTA|FRACIONARIO)\n([A-Z]{4}[0-9]{1,2})F?\n(?:(?:PN|ON|UNT|PNA|PNB)\n)?([0-9.]+)\n([0-9.]+,[0-9]{2})\n([0-9.]+,[0-9]{2})\n([DC])\n'
+    _TAXA_LIQUIDACAO_PATTERN = r'([0-9.]+,[0-9]{2})\nTaxa de liquidação/CCP\n'
     _EMOLUMENTOS_PATTERN = r'([0-9.]+,[0-9]{2})\nEmolumentos\n'
+    _TAXA_TRANSFERENCIA_PATTERN = r'Taxa de Transferencia de Ativos\n([0-9.]+,[0-9]{2})\n'
     _IRRF_PATTERN = r'([0-9.]+,[0-9]{2})\n[0-9.]+,[0-9]{2}\nI\.R\.R\.F\. s/ operações, base R\$\n'
     _VENDAS_PATTERN = r'([0-9.]+,[0-9]{2})\nVendas à vista\n'
     _COMPRAS_PATTERN = r'Compras à vista\n([0-9.]+,[0-9]{2})'
@@ -34,6 +35,7 @@ class BTGReader:
             'negocios': [],
             'liquidacao': re.findall(self._TAXA_LIQUIDACAO_PATTERN, self._raw_text)[0],
             'emolumentos': re.findall(self._EMOLUMENTOS_PATTERN, self._raw_text)[0],
+            'transferencia': re.findall(self._TAXA_TRANSFERENCIA_PATTERN, self._raw_text)[0],
             'irrf': re.findall(self._IRRF_PATTERN, self._raw_text)[0],
             'vendas': self.parse_price(re.findall(self._VENDAS_PATTERN, self._raw_text)[0]),
             'compras': self.parse_price(re.findall(self._COMPRAS_PATTERN, self._raw_text)[0]),
@@ -64,6 +66,7 @@ class BTGReader:
 
         print("\n\nTaxa de liquidação = R$ " + str(self._result['liquidacao']))
         print("Emolumentos = R$ " + str(self._result['emolumentos']))
+        print("Taxa de Transferência de Ativos = R$ " + str(self._result['transferencia']))
         print("IRRF = R$ " + str(self._result['irrf']))
         print("\n\nTotal compras = R$ " + str(self._result['compras']))
         print("Total vendas = R$ " + str(self._result['vendas']))
