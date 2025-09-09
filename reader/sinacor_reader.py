@@ -9,6 +9,7 @@ class SinacorReader:
     _TICKER_PATTERN = r'([A-Z][A-Z][A-Z][A-Z][0-9]+)'
     _TAXA_LIQUIDACAO_PATTERN = r'([0-9.]+,[0-9]{2})\nTaxa de liquidação'
     _EMOLUMENTOS_PATTERN = r'([0-9.]+,[0-9]{2})\nEmolumentos'
+    _TAXA_TRANSFERENCIA_ATIVOS_PATTERN = r'([0-9.]+,[0-9]{2})\nTaxa de Transf. de Ativos'
     _IRRF_PATTERN = r'([0-9.]+,[0-9]{2})\nI.R.R.F. s/ operações'
     _OUTROS_PATTERN = r'([0-9.]+,[0-9]{2})\nOutros'
     _TOTAL_OPERACOES_PATTERN = r'([0-9.]+,[0-9]{2})\nResumo dos Negócios'
@@ -76,6 +77,7 @@ class SinacorReader:
             'negocios': defaultdict(int),
             'liquidacao': re.findall(self._TAXA_LIQUIDACAO_PATTERN, self._raw_text)[0],
             'emolumentos': re.findall(self._EMOLUMENTOS_PATTERN, self._raw_text)[0],
+            'taxa_transferencia_ativos': re.findall(self._TAXA_TRANSFERENCIA_ATIVOS_PATTERN, self._raw_text)[0],
             'irrf': re.findall(self._IRRF_PATTERN, self._raw_text)[0],
             'outros': re.findall(self._OUTROS_PATTERN, self._raw_text)[0],
             'total_operacoes': self.parse_price(re.findall(self._TOTAL_OPERACOES_PATTERN, self._raw_text)[0])
@@ -101,6 +103,7 @@ class SinacorReader:
 
         print("\n\nTaxa de liquidação = R$ " + str(self._result['liquidacao']))
         print("Emolumentos = R$ " + str(self._result['emolumentos']))
+        print("Taxa de Transf. de Ativos = R$ " + str(self._result['taxa_transferencia_ativos']))
         print("Outros = R$ " + str(self._result['outros']))
         print("IRRF = R$ " + str(self._result['irrf']))
 
