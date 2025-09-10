@@ -4,9 +4,17 @@ import re
 
 class ItauReader:
     _TICKERS_FILE = 'tickers.csv'
-    _NEGOCIACOES_PATTERN = r'(BOVESPA|B3 RV LISTADO)\n([CV])\n(VISTA|FRACIONARIO)\n(.*)\n(?:.*?\n?)([0-9.]+)\n([0-9.]+,[0-9]{2})\n([0-9.]+,[0-9]{2})\n([CD])\n'
+    _NEGOCIACOES_PATTERN = r'(BOVESPA|B3 RV LISTADO|B3 RV LISTA V|B3 RV LISTA C)\n' \
+                       r'(VISTA|FRACIONARIO)\n' \
+                       r'(.+?)\n' \
+                       r'(?:[@]*[#]*\n)?' \
+                       r'([0-9.]+)\n' \
+                       r'([0-9.]+,[0-9]{2})\n' \
+                       r'([0-9.]+,[0-9]{2})\n' \
+                       r'([CD])(?:\n|$)'
+
     _TICKER_PATTERN = r'([A-Z][A-Z][A-Z][A-Z][0-9]+)'
-    _TAXA_LIQUIDACAO_PATTERN = r'(Taxa de liquidação)\n-?([0-9.]+,[0-9]{2})'
+    _TAXA_LIQUIDACAO_PATTERN = r'(Taxa de liquidação|Taxa de liquidação/CCP)\n-?([0-9.]+,[0-9]{2})'
     _EMOLUMENTOS_PATTERN = r'(Emolumentos)\n-?([0-9.]+,[0-9]{2})'
     _IRRF_PATTERN = r'(I.R.R.F s/operações. Base).*\n([0-9.]+,[0-9]{2})'
     _VENDAS_PATTERN = r'(Vendas à Vista)\n([0-9.]+,[0-9]{2})'
@@ -22,7 +30,8 @@ class ItauReader:
     def parse_quantity(self, value: str, cv='C') -> int:
         cleaned_str = self.clean_string(value).replace('.', '')
         value = abs(int(cleaned_str))
-        return value if cv.strip() == 'C' else value * -1
+        return -value if cv.strip() == 'C' else value
+
 
     def parse_price(self, value: str) -> float:
         cleaned_str = self.clean_string(value).replace('.', '').replace(',', '.')
@@ -93,15 +102,15 @@ class ItauReader:
             'compras': self.parse_price(re.findall(self._COMPRAS_PATTERN, self._raw_text)[0][1]),
             'total_operacoes': self.parse_price(re.findall(self._TOTAL_OPERACOES_PATTERN, self._raw_text)[0][1])
         }
-        #print(self._raw_text)
+
         total = 0.0
 
         for neg in re.findall(self._NEGOCIACOES_PATTERN, self._raw_text):
-            quantity = self.parse_quantity(neg[4], cv=neg[1])
-            price = self.parse_price(neg[5])
+            quantity = self.parse_quantity(neg[3], cv=neg[6])
+            price = self.parse_price(neg[4])
             self.result['negocios'].append(
                 {
-                    'ticker': self.parse_ticker(neg[3]),
+                    'ticker': self.parse_ticker(neg[2]),
                     'quantity': quantity,
                     'price': price,
                 }
