@@ -4,7 +4,7 @@ import re
 
 class ItauReader:
     _TICKERS_FILE = 'tickers.csv'
-    _NEGOCIACOES_PATTERN = r'(BOVESPA|B3 RV LISTADO|B3 RV LISTA V|B3 RV LISTA C)\n' \
+    _NEGOCIACOES_PATTERN = r'(BOVESPA|B3 RV LISTADO|B3 RV LISTADC|B3 RV LISTA V|B3 RV LISTA C)\n' \
                        r'(VISTA|FRACIONARIO)\n' \
                        r'(.+?)\n' \
                        r'(?:[@]*[#]*\n)?' \
