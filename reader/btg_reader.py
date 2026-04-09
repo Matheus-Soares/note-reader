@@ -13,7 +13,6 @@ class BTGReader:
 
     def __init__(self, raw_text):
         self._raw_text = raw_text
-        print(raw_text)
         self._result = {}
 
     def parse_quantity(self, value: str, cv='C') -> int:
